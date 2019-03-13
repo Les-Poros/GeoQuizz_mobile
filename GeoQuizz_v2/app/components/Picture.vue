@@ -3,31 +3,23 @@
         <ActionBar title="Geo Quizz"/>
 		<ScrollView orientation='vertical'>
         <StackLayout orientation='vertical'>
-
+			<label v-bind:text="idSerie" ></label>
 			<Button text="Prendre une photo" @tap="takePicture" />
 			<Button text="Choisir une photo" @tap="selectPicture" />
 			<!--<Button text="voir localisation" @tap="GetLocationTap"/>-->
 				<template id="modal" v-if="modalActive">
 					<StackLayout class="p-20" backgroundColor="white">
-						<Image :src="imgModal['src']" width="200" height="200"/>
+						<Image :src="imgModal['src']" width="200" height="200" />
 						<Button class="btn btn-outline" text="Supprimer la photo" @tap="removeImage(imgModal)" />
 						<Button class="btn btn-outline" text="Fermer" @tap="closeModal()" />
 					</StackLayout>
 				</template>
 
-				<!-- 
-					
-
-
-					AJOUTER ANCRE POUR REMONTER SUR LA GRANDE IMAGE QUAND ON OUVRE LA MODALE
-					
-					
-					-->
 			<WrapLayout>				
-				<Image v-for="img in images" :src="img['src']" width="75" height="75"  @tap="showModal(img)"/>
+				<Image v-for="img in images" :src="img['src']" width="75" height="75" @tap="showModal(img)"/>
 			</WrapLayout>
 			<!--<label v-for="img in imagesAvecLoc" :text="img['loc']['lat']" ></label>-->
-			<Button text="Envoyer les photos" @tap="sendPictures" v-bind:isEnabled="hasPicture" />
+			<Button text="Envoyer les photos" @tap="sendPictures()" v-bind:isEnabled="hasPicture" />
         </StackLayout>
 		</ScrollView>
     </Page>
@@ -36,12 +28,14 @@
 
 
 <script>
+
 import * as camera from "nativescript-camera";
 import * as imagepicker from "nativescript-imagepicker";
 
 import { Image } from "tns-core-modules/ui/image";
 import { isEnabled, enableLocationRequest, getCurrentLocation, watchLocation, distance, clearWatch } from "nativescript-geolocation";
 var geolocation = require("nativescript-geolocation");
+//var VueScrollTo = require('vue-scrollto');
 
 //import ModalComponent from "./ModalComponent";
  
@@ -54,8 +48,12 @@ export default {
 			hasPicture: false,
 			modalActive: false,
 			imgModal: '',
+			//idSerie: 'dsxgf',
 		}
 	},
+	/*props:[
+		'idSerie'
+	],*/
 	methods:{
 		// Méthode qui permet de séléctionner une photo dans l'album
 		selectPicture() {
@@ -135,18 +133,22 @@ export default {
 
 			}
 		},
+		// Méthode qui va envoyer les photos à la série
 		sendPictures(){
 			// faire requete ici
 		},
+		// Méthode qui ouvre une modale avec l'image
 		showModal(img) {
 			this.modalActive = true;
 			this.imgModal = img;
 		},
 		closeModal() {
+		// Méthode qui ferme la modale
 			this.modalActive = false;
 			this.imgModal = '';
 		},
 		removeImage(img){
+		// Méthode qui supprime la photo séléctionnée
 			this.images.splice(img['index'],1)
 			this.modalActive = false;
 			this.imgModal = '';

@@ -4,7 +4,9 @@
         <StackLayout>
 			<label text="Série :"></label>
 			<ListPicker :items="listOfItems" v-model="picked" ></ListPicker>
-			<Button text="Prendre une photo" @tap="$goTo('picture', {context : { propsData: { idSerie: picked}}})" v-bind:isEnabled="picked != 0" />
+			<Button text="Prendre une photo" @tap="$goTo('picture', {data : { idSerie: picked}})" v-bind:isEnabled="picked != 0" />
+			<label text="ou :"></label>
+			<Button text="Créer une série" @tap="$goTo('serie')" />
         </StackLayout>
     </Page>
 </template>

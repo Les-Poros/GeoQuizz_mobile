@@ -18,7 +18,8 @@
     "nativescript-theme-core": "~1.0.4",
     "nativescript-vue": "~2.0.0",
     "tns-core-modules": "~5.2.0",
-    "vue-router": "^3.0.2"
+    "vue-router": "^3.0.2",
+    "vue-scrollto": "^2.14.0"
   },
   "devDependencies": {
     "@babel/core": "~7.1.0",
