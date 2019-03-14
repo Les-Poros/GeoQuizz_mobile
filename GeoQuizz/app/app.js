@@ -11,8 +11,5 @@ Vue.prototype.$goTo = function (to, option) {
 }
 
 new Vue({
-    data: {
-        apiUrl: conf.apiUrl
-    },
-    render: h => h('frame', [h(router['home'])])
+    render: h => h('frame', [h(router['home'],{props : {url:conf.apiUrl}})])
 }).$start();
