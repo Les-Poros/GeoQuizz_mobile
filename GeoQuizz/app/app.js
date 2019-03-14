@@ -4,8 +4,8 @@ import Vue from "nativescript-vue";
 import router from "./router";
 
 Vue.prototype.$router = router
-Vue.prototype.$goTo = function (to){
-    this.$navigateTo(this.$router[to])
+Vue.prototype.$goTo = function (to,option){
+    this.$navigateTo(this.$router[to],option)
 }
 
 new Vue({

@@ -4,6 +4,7 @@
 		<ScrollView orientation='vertical'>
         <StackLayout orientation='vertical'>
 			<label v-bind:text="idSerie" ></label>
+			{{idSerie}}
 			<Button text="Prendre une photo" @tap="takePicture" />
 			<Button text="Choisir une photo" @tap="selectPicture" />
 			<!--<Button text="voir localisation" @tap="GetLocationTap"/>-->
@@ -41,6 +42,9 @@ var geolocation = require("nativescript-geolocation");
  
 
 export default {
+	props:[
+		'idSerie'
+	],
 	data() {
 		return {
 			images:[],
@@ -51,9 +55,6 @@ export default {
 			//idSerie: 'dsxgf',
 		}
 	},
-	/*props:[
-		'idSerie'
-	],*/
 	methods:{
 		// Méthode qui permet de séléctionner une photo dans l'album
 		selectPicture() {
