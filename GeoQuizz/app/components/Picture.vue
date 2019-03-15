@@ -3,12 +3,9 @@
     <ActionBar title="Geo Quizz"/>
     <ScrollView orientation="vertical">
       <StackLayout orientation="vertical">
-        <label v-bind:text="idVille"></label>
-        {{idVille}}
-        <label>{{url}}</label>
         <Button text="Prendre une photo" @tap="takePicture"/>
         <Button text="Choisir une photo" @tap="selectPicture"/>
-        <!--<Button text="voir localisation" @tap="GetLocationTap"/>-->
+        <label v-if="!connection" textWrap="true">Vous êtes hors connexion. Vous ne pouvez pas envoyer de photo</label>
         <template id="modal" v-if="modalActive">
           <StackLayout class="p-20" backgroundColor="white">
             <Image :src="imgModal['src']" width="200" height="200"/>
@@ -18,16 +15,10 @@
         </template>
 
         <WrapLayout>
-          <Image
-            v-for="img in images"
-            :src="img['src']"
-            width="75"
-            height="75"
-            @tap="showModal(img)"
-          />
+          <Image v-for="img in images" :src="img['src']" width="75" height="75" @tap="showModal(img)" />
         </WrapLayout>
         <!--<label v-for="img in imagesAvecLoc" :text="img['loc']['lat']" ></label>-->
-        <Button text="Envoyer les photos" @tap="sendPictures()" v-bind:isEnabled="hasPicture"/>
+        <Button text="Envoyer les photos" @tap="sendPictures()" v-bind:isEnabled="hasPicture" v-if="connection"/>
       </StackLayout>
     </ScrollView>
   </Page>
@@ -40,18 +31,11 @@ import * as camera from "nativescript-camera";
 import * as imagepicker from "nativescript-imagepicker";
 
 import { Image } from "tns-core-modules/ui/image";
-import {
-  isEnabled,
-  enableLocationRequest,
-  getCurrentLocation,
-  watchLocation,
-  distance,
-  clearWatch
-} from "nativescript-geolocation";
+import { isEnabled, enableLocationRequest, getCurrentLocation, watchLocation, distance, clearWatch } from "nativescript-geolocation";
 var geolocation = require("nativescript-geolocation");
-//var VueScrollTo = require('vue-scrollto');
 
-//import ModalComponent from "./ModalComponent";
+import { connectionType, getConnectionType, startMonitoring, stopMonitoring }from "tns-core-modules/connectivity";
+
 
 export default {
   props: ["idVille", "url"],
@@ -61,7 +45,8 @@ export default {
       localisation: [],
       hasPicture: false,
       modalActive: false,
-      imgModal: ""
+      imgModal: "",
+      connection: '',
     };
   },
   methods: {
@@ -177,7 +162,21 @@ export default {
       this.images.splice(img["index"], 1);
       this.modalActive = false;
       this.imgModal = "";
+    },
+  },
+  created(){
+    var myConn = getConnectionType();
+    if(myConn != connectionType.none){
+      this.connection = true;
     }
+    startMonitoring((newConnectionType) => {
+      if(newConnectionType == connectionType.none){
+        this.connection = false;
+      }
+      else{
+        this.connection = true;
+      }
+    });
   }
 };
 </script>
