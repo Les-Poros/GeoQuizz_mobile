@@ -3,12 +3,9 @@
     <ActionBar title="Geo Quizz"/>
     <ScrollView orientation="vertical">
       <StackLayout orientation="vertical">
-        <label v-bind:text="idVille"></label>
-        {{idVille}}
-        <label>{{url}}</label>
         <Button text="Prendre une photo" @tap="takePicture"/>
         <Button text="Choisir une photo" @tap="selectPicture"/>
-        <!--<Button text="voir localisation" @tap="GetLocationTap"/>-->
+        <label v-if="!connection" textWrap="true">Vous êtes hors connexion. Vous ne pouvez pas envoyer de photo</label>
         <template id="modal" v-if="modalActive">
           <StackLayout class="p-20" backgroundColor="white">
             <Image :src="imgModal['src']" width="200" height="200"/>
@@ -18,16 +15,10 @@
         </template>
 
         <WrapLayout>
-          <Image
-            v-for="img in images"
-            :src="img['src']"
-            width="75"
-            height="75"
-            @tap="showModal(img)"
-          />
+          <Image v-for="img in images" :src="img['src']" width="75" height="75" @tap="showModal(img)" />
         </WrapLayout>
         <!--<label v-for="img in imagesAvecLoc" :text="img['loc']['lat']" ></label>-->
-        <Button text="Envoyer les photos" @tap="sendPictures()" v-bind:isEnabled="hasPicture"/>
+        <Button text="Envoyer les photos" @tap="sendPictures()" v-bind:isEnabled="hasPicture" v-if="connection"/>
       </StackLayout>
     </ScrollView>
   </Page>
@@ -40,18 +31,13 @@ import * as camera from "nativescript-camera";
 import * as imagepicker from "nativescript-imagepicker";
 
 import { Image } from "tns-core-modules/ui/image";
-import {
-  isEnabled,
-  enableLocationRequest,
-  getCurrentLocation,
-  watchLocation,
-  distance,
-  clearWatch
-} from "nativescript-geolocation";
+import { isEnabled, enableLocationRequest, getCurrentLocation, watchLocation, distance, clearWatch } from "nativescript-geolocation";
 var geolocation = require("nativescript-geolocation");
-//var VueScrollTo = require('vue-scrollto');
 
-//import ModalComponent from "./ModalComponent";
+import axios from "axios";
+
+import { connectionType, getConnectionType, startMonitoring, stopMonitoring }from "tns-core-modules/connectivity";
+
 
 export default {
   props: ["idVille", "url"],
@@ -61,7 +47,10 @@ export default {
       localisation: [],
       hasPicture: false,
       modalActive: false,
-      imgModal: ""
+      imgModal: "",
+      connection: '',
+      postBody: "",
+      idPhoto: ""
     };
   },
   methods: {
@@ -78,14 +67,18 @@ export default {
         })
         .then(selection => {
           selection.forEach(selected => {
-            console.log(JSON.stringify(selected));
+
+            let jsonImg = JSON.stringify(selected);
+            let storageImage = Object.values(selected).slice(-1)[0];
+            var splitImage = storageImage.split('.');
+            let ext = '.'+splitImage[splitImage.length-1];
 
             let img = new Image();
             img.src = selected;
 
             let index = this.images.length;
 
-            let tabImage = { src: selected, loc: "", index: index };
+            let tabImage = { src: selected, loc: {lat: "", long: ""}, index: index, extension: ext };
             this.images.push(tabImage);
 
             this.isEmptyImages();
@@ -109,6 +102,12 @@ export default {
               saveToGallery: false
             })
             .then(imageAsset => {
+              
+              let jsonImg = JSON.stringify(imageAsset);
+              let storageImage = Object.values(imageAsset).slice(-1)[0];
+              var splitImage = storageImage.split('.');
+              let ext = '.'+splitImage[splitImage.length-1];
+
               let img = new Image();
               img.src = imageAsset;
 
@@ -117,7 +116,8 @@ export default {
               let tabImage = {
                 src: imageAsset,
                 loc: this.localisation,
-                index: index
+                index: index,
+                extension: ext
               };
               this.images.push(tabImage);
 
@@ -160,7 +160,24 @@ export default {
     },
     // Méthode qui va envoyer les photos à la série
     sendPictures() {
-      // faire requete ici
+      this.images.forEach(image => {
+        this.postBody = {
+          "latitude": image['loc']['lat'],
+          "longitude": image['loc']['long'],
+          "desc": "",
+          "url": image['extension']
+        };
+        axios
+          .post("https://lesporos.pagekite.me/series/"+this.idVille+"/photos", this.postBody, {
+          headers: {
+            "Content-Type": "application/json"
+          },
+        })
+        .then(response => {
+          this.idPhoto = response.data.id;
+          /*axios.put("https://lesporos.pagekite.me/series/"+this.idVille+"/photos/"+this.idPhoto)*/
+        });
+      });
     },
     // Méthode qui ouvre une modale avec l'image
     showModal(img) {
@@ -177,13 +194,21 @@ export default {
       this.images.splice(img["index"], 1);
       this.modalActive = false;
       this.imgModal = "";
+    },
+  },
+  created(){
+    var myConn = getConnectionType();
+    if(myConn != connectionType.none){
+      this.connection = true;
     }
+    startMonitoring((newConnectionType) => {
+      if(newConnectionType == connectionType.none){
+        this.connection = false;
+      }
+      else{
+        this.connection = true;
+      }
+    });
   }
 };
 </script>
-
-<style>
-#modal {
-  z-index: 2;
-}
-</style>

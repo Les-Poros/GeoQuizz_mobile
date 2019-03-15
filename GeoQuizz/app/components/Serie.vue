@@ -21,6 +21,8 @@ export default {
       latitudeVille: "",
       longitudeVille: "",
       postBody: "",
+      idSerie: "",
+      link: ""
     };
   },
   methods: {
@@ -38,7 +40,9 @@ export default {
           },
         })
         .then(response => {
-          this.$goTo("picture");
+          this.idSerie = response.data.id;
+          this.link = "http://lesporos.pagekite.me/series/"+this.idSerie;
+          this.$goTo("picture", { props: { idVille: this.idSerie, url: this.link }});
         })
         .catch(error => {
           console.log(error);
