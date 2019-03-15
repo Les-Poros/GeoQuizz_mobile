@@ -41,7 +41,7 @@ import { connectionType, getConnectionType, startMonitoring, stopMonitoring }fro
 
 
 export default {
-  props: ["idVille", "url", "nom" ],
+  props: ["idZone", "url", "nom" ],
   data() {
     return {
       images: [],
@@ -169,14 +169,14 @@ export default {
           "url": image['extension']
         };
         axios
-          .post("https://lesporos.pagekite.me/series/"+this.idVille+"/photos", this.postBody, {
+          .post("https://lesporos.pagekite.me/series/"+this.idZone+"/photos", this.postBody, {
           headers: {
             "Content-Type": "application/json"
           },
         })
         .then(response => {
           this.idPhoto = response.data.id;
-          /*axios.put("https://lesporos.pagekite.me/series/"+this.idVille+"/photos/"+this.idPhoto)*/
+          /*axios.put("https://lesporos.pagekite.me/series/"+this.idZone+"/photos/"+this.idPhoto)*/
         });
       });
     },

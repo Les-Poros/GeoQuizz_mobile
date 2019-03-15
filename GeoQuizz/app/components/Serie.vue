@@ -3,11 +3,11 @@
     <ActionBar title="Geo Quizz"/>
     <StackLayout class="content">
       <label text="Informations de la zone :"></label>
-      <TextField class="textField" v-model="nomVille" hint="Nom de la zone"/>
-      <TextField class="textField" v-model="latitudeVille" hint="Latitude de la zone"/>
-      <TextField class="textField" v-model="longitudeVille" hint="Longitude de la zone"/>
+      <TextField class="textField" v-model="nomZone" hint="Nom de la zone"/>
+      <TextField class="textField" v-model="latitudeZone" hint="Latitude de la zone"/>
+      <TextField class="textField" v-model="longitudeZone" hint="Longitude de la zone"/>
       <label v-if="!connection" textWrap="true">Vous êtes hors connexion. Vous ne pouvez pas créer de séries !</label>
-      <Button text="Créer la zone et ajouter des photos" @tap="createSerie" v-bind:isEnabled="nomSerie != ''" />
+      <Button text="Créer la zone et ajouter des photos" @tap="createZone" v-bind:isEnabled="connection == true" />
     </StackLayout>
   </Page>
 </template>
@@ -19,33 +19,33 @@ import { connectionType, getConnectionType, startMonitoring, stopMonitoring }fro
 export default {
   data() {
     return {
-      nomVille: "",
-      latitudeVille: "",
-      longitudeVille: "",
+      nomZone: "",
+      latitudeZone: "",
+      longitudeZone: "",
       postBody: "",
-      idSerie: "",
+      idZone: "",
       link: "",
       connection: ''
     };
   },
   methods: {
-    createSerie() {
+    createZone() {
       this.postBody = {
-        "ville": this.nomVille,
-        "map_lat": this.latitudeVille,
-        "map_lon": this.longitudeVille,
+        "ville": this.nomZone,
+        "map_lat": this.latitudeZone,
+        "map_lon": this.longitudeZone,
         "dist": 500
       };
       axios
-        .post("https://lesporos.pagekite.me/series", this.postBody, {
+        .post("https://lesporos.pagekite.me/series/", this.postBody, {
           headers: {
             "Content-Type": "application/json"
           },
         })
         .then(response => {
           this.idSerie = response.data.id;
-          this.link = "http://lesporos.pagekite.me/series/"+this.idSerie;
-          this.$goTo("picture", { props: { idVille: this.idSerie, url: this.link, nom: this.nomZone }});
+          this.link = "http://lesporos.pagekite.me/series/"+this.idZone;
+          this.$goTo("picture", { props: { idZone: this.idZone, url: this.link, nom: this.nomZone }});
         })
         .catch(error => {
           console.log(error);
