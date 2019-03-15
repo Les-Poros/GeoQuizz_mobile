@@ -2,7 +2,7 @@
   <Page>
     <ActionBar title="Geo Quizz"/>
     <StackLayout class="content">
-      <label text="Nom de la zone :"></label>
+      <label text="Informations de la zone :"></label>
       <TextField class="textField" v-model="nomVille" hint="Nom de la zone"/>
       <TextField class="textField" v-model="latitudeVille" hint="Latitude de la zone"/>
       <TextField class="textField" v-model="longitudeVille" hint="Longitude de la zone"/>
