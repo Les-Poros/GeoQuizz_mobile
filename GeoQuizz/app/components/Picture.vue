@@ -3,6 +3,7 @@
     <ActionBar title="Geo Quizz"/>
     <ScrollView orientation="vertical">
       <StackLayout orientation="vertical">
+        <label>Zone : {{nom}}</label>
         <Button text="Prendre une photo" @tap="takePicture"/>
         <Button text="Choisir une photo" @tap="selectPicture"/>
         <label v-if="!connection" textWrap="true">Vous êtes hors connexion. Vous ne pouvez pas envoyer de photos !</label>
@@ -40,7 +41,7 @@ import { connectionType, getConnectionType, startMonitoring, stopMonitoring }fro
 
 
 export default {
-  props: ["idVille", "url"],
+  props: ["idVille", "url", "nom" ],
   data() {
     return {
       images: [],

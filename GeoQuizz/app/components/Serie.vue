@@ -45,7 +45,7 @@ export default {
         .then(response => {
           this.idSerie = response.data.id;
           this.link = "http://lesporos.pagekite.me/series/"+this.idSerie;
-          this.$goTo("picture", { props: { idVille: this.idSerie, url: this.link }});
+          this.$goTo("picture", { props: { idVille: this.idSerie, url: this.link, nom: this.nomZone }});
         })
         .catch(error => {
           console.log(error);
