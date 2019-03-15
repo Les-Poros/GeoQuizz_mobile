@@ -2,10 +2,11 @@
   <Page>
     <ActionBar title="Geo Quizz"/>
     <StackLayout class="content">
-      <label text="Nom de la série :"></label>
-      <TextField class="textField" v-model="nomVille" hint="Nom de la série"/>
+      <label text="Nom de la zone :"></label>
+      <TextField class="textField" v-model="nomVille" hint="Nom de la zone"/>
       <TextField class="textField" v-model="latitudeVille" hint="Latitude de la zone"/>
       <TextField class="textField" v-model="longitudeVille" hint="Longitude de la zone"/>
+      <label v-if="!connection" textWrap="true">Vous êtes hors connexion. Vous ne pouvez pas créer de séries !</label>
       <Button text="Créer la zone et ajouter des photos" @tap="createSerie" v-bind:isEnabled="nomSerie != ''" />
     </StackLayout>
   </Page>
@@ -13,6 +14,7 @@
 
 <script>
 import axios from "axios";
+import { connectionType, getConnectionType, startMonitoring, stopMonitoring }from "tns-core-modules/connectivity";
 
 export default {
   data() {
@@ -22,7 +24,8 @@ export default {
       longitudeVille: "",
       postBody: "",
       idSerie: "",
-      link: ""
+      link: "",
+      connection: ''
     };
   },
   methods: {
@@ -48,6 +51,20 @@ export default {
           console.log(error);
         });
     }
+  },
+  created(){
+    var myConn = getConnectionType();
+    if(myConn != connectionType.none){
+      this.connection = true;
+    }
+    startMonitoring((newConnectionType) => {
+      if(newConnectionType == connectionType.none){
+        this.connection = false;
+      }
+      else{
+        this.connection = true;
+      }
+    });
   }
 };
 </script>

@@ -3,11 +3,12 @@
     <ActionBar title="Geo Quizz"/>
       <ScrollView orientation="vertical">
         <StackLayout class="content" orientation="vertical">
+          <label v-if="!connection" textWrap="true">Vous êtes hors connexion. Vous ne pouvez pas prendre de photos et créer de séries !</label>
           <Image id="logo" src="~/logo.png" width="150" height="150"/>
           <ListPicker :items="getListOfSeries" v-model="position" v-if="estCompleteListe"></ListPicker>
           <Button text="Prendre une photo" @tap="redirectToPicture" v-bind:isEnabled="position != 0"/>
           <label class="homeLabel" text="ou :"></label>
-          <Button text="Créer une zone" @tap="$goTo('serie')"/>
+          <Button text="Créer une zone" @tap="$goTo('serie')" v-bind:isEnabled='connection == true'/>
         </StackLayout>
       </ScrollView>
   </Page>
@@ -15,6 +16,8 @@
 
 <script>
 import { ListPicker } from "tns-core-modules/ui/list-picker";
+import { connectionType, getConnectionType, startMonitoring, stopMonitoring }from "tns-core-modules/connectivity";
+
 import axios from "axios";
 
 export default {
@@ -23,7 +26,8 @@ export default {
     return {
       listOfItems: [],
       position: 0,
-      estCompleteListe: true
+      estCompleteListe: true,
+      connection: ''
     };
   },
   methods: {
@@ -42,19 +46,31 @@ export default {
     }
   },
   created() {
-    axios
-      .get("https://lesporos.pagekite.me/series")
-      .then(response => {
-        let contentSerie = response.data.content;
-        contentSerie.forEach(content => {
-          let city = { id: content.id, ville: content.ville };
-          this.listOfItems.push(city);
-        });
-        this.estCompleteListe = true;
-      })
-      .catch(error => {
-        console.log(error);
-      });
+    var myConn = getConnectionType();
+    if(myConn != connectionType.none){
+      this.connection = true;
+    }
+    startMonitoring((newConnectionType) => {
+      if(newConnectionType == connectionType.none){
+        this.connection = false;
+      }
+      else{
+        this.connection = true;
+        axios
+          .get("https://lesporos.pagekite.me/series")
+          .then(response => {
+            let contentSerie = response.data.content;
+            contentSerie.forEach(content => {
+              let city = { id: content.id, ville: content.ville };
+              this.listOfItems.push(city);
+            });
+            this.estCompleteListe = true;
+          })
+          .catch(error => {
+            console.log(error);
+          });
+      }
+    });
   }
 };
 </script>

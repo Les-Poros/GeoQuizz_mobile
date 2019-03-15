@@ -5,7 +5,7 @@
       <StackLayout orientation="vertical">
         <Button text="Prendre une photo" @tap="takePicture"/>
         <Button text="Choisir une photo" @tap="selectPicture"/>
-        <label v-if="!connection" textWrap="true">Vous êtes hors connexion. Vous ne pouvez pas envoyer de photo</label>
+        <label v-if="!connection" textWrap="true">Vous êtes hors connexion. Vous ne pouvez pas envoyer de photos !</label>
         <template id="modal" v-if="modalActive">
           <StackLayout class="p-20" backgroundColor="white">
             <Image :src="imgModal['src']" width="200" height="200"/>
