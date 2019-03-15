@@ -20,6 +20,8 @@
         </WrapLayout>
         <!--<label v-for="img in imagesAvecLoc" :text="img['loc']['lat']" ></label>-->
         <Button text="Envoyer les photos" @tap="sendPictures()" v-bind:isEnabled="hasPicture" v-if="connection"/>
+
+        <!--<label v-for="i in images">{{i['index']}}</label>-->
       </StackLayout>
     </ScrollView>
   </Page>
@@ -114,12 +116,7 @@ export default {
 
               let index = this.images.length;
 
-              let tabImage = {
-                src: imageAsset,
-                loc: this.localisation,
-                index: index,
-                extension: ext
-              };
+              let tabImage = {src: imageAsset, loc: this.localisation, index: index, extension: ext };
               this.images.push(tabImage);
 
               this.isEmptyImages();
@@ -158,6 +155,9 @@ export default {
       if (this.images.length != 0) {
         this.hasPicture = true;
       }
+      else{
+        this.hasPicture = false;
+      }
     },
     // Méthode qui va envoyer les photos à la série
     sendPictures() {
@@ -193,8 +193,10 @@ export default {
     removeImage(img) {
       // Méthode qui supprime la photo séléctionnée
       this.images.splice(img["index"], 1);
+      /////////////////////////////////////////////VERIFIER SUPPRESSION DANS LE TABLEAU//////////////////////////////////////////////////////////////
       this.modalActive = false;
       this.imgModal = "";
+      this.isEmptyImages();
     },
   },
   created(){
