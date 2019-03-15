@@ -3,12 +3,8 @@
     <ActionBar title="Geo Quizz"/>
     <StackLayout>
       <label text="Série :"></label>
-      <ListPicker :items="listOfItems" v-model="picked"></ListPicker>
-      <Button
-        text="Prendre une photo"
-        @tap="$goTo('picture', {props : { idSerie: picked, url: url}})"
-        v-bind:isEnabled="picked != 0"
-      />
+      <ListPicker :items="getListOfSeries" v-model="position" v-if="estCompleteListe"></ListPicker>
+      <Button text="Prendre une photo" @tap="redirectToPicture" v-bind:isEnabled="position != 0"/>
       <label text="ou :"></label>
       <Button text="Créer une série" @tap="$goTo('serie')"/>
     </StackLayout>
@@ -17,28 +13,46 @@
 
 <script>
 import { ListPicker } from "tns-core-modules/ui/list-picker";
+import axios from "axios";
 
 export default {
   props: ["url"],
   data() {
     return {
-      listOfItems: ["Choisissez une série", "Nancy", "Londres"],
-      picked: "0"
+      listOfItems: [],
+      position: 0,
+      estCompleteListe: true
     };
   },
   methods: {
-    /*getListSeries: function () {
-			axios
-                .get('http://ainz.org/ws/2/artist/?query=artist:' + this.search.trim() + '&fmt=json')
-                .then(response => {
-                    this.listArtists = response.data.artists;
-                    this.estVideArt = false;
-                    console.log(this.listArtists);
-                })
-                .catch(error => {
-                    console.log(error);
-                })
-		}*/
+    redirectToPicture: function() {
+      let idSerie = this.listOfItems[this.position - 1]["id"];
+      this.$goTo("picture", { props: { idVille: idSerie, url: this.url } });
+    }
+  },
+  computed: {
+    getListOfSeries: function() {
+      let listVilles = ["Choisissez une ville"];
+      this.listOfItems.forEach(item => {
+        listVilles.push(item["ville"]);
+      });
+      return listVilles;
+    }
+  },
+  created() {
+    axios
+      .get("https://lesporos.pagekite.me/series")
+      .then(response => {
+        let contentSerie = response.data.content;
+        contentSerie.forEach(content => {
+          let city = { id: content.id, ville: content.ville };
+          this.listOfItems.push(city);
+        });
+        this.estCompleteListe = true;
+      })
+      .catch(error => {
+        console.log(error);
+      });
   }
 };
 </script>

@@ -3,8 +3,8 @@
     <ActionBar title="Geo Quizz"/>
     <ScrollView orientation="vertical">
       <StackLayout orientation="vertical">
-        <label v-bind:text="idSerie"></label>
-        {{idSerie}}
+        <label v-bind:text="idVille"></label>
+        {{idVille}}
         <label>{{url}}</label>
         <Button text="Prendre une photo" @tap="takePicture"/>
         <Button text="Choisir une photo" @tap="selectPicture"/>
@@ -54,7 +54,7 @@ var geolocation = require("nativescript-geolocation");
 //import ModalComponent from "./ModalComponent";
 
 export default {
-  props: ["idSerie", "url"],
+  props: ["idVille", "url"],
   data() {
     return {
       images: [],
@@ -62,7 +62,6 @@ export default {
       hasPicture: false,
       modalActive: false,
       imgModal: ""
-      //idSerie: 'dsxgf',
     };
   },
   methods: {
