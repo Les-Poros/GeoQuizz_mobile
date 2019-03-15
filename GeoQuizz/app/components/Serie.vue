@@ -1,16 +1,12 @@
 <template>
   <Page>
     <ActionBar title="Geo Quizz"/>
-    <StackLayout>
+    <StackLayout class="content">
       <label text="Nom de la série :"></label>
-      <TextField v-model="nomVille" hint="Nom de la série"/>
-      <TextField v-model="latitudeVille" hint="Latitude de la ville"/>
-      <TextField v-model="longitudeVille" hint="Longitude de la ville"/>
-      <Button
-        text="Créer la série et ajouter des photos"
-        @tap="createSerie"
-        v-bind:isEnabled="nomSerie != ''"
-      />
+      <TextField class="textField" v-model="nomVille" hint="Nom de la série"/>
+      <TextField class="textField" v-model="latitudeVille" hint="Latitude de la zone"/>
+      <TextField class="textField" v-model="longitudeVille" hint="Longitude de la zone"/>
+      <Button text="Créer la zone et ajouter des photos" @tap="createSerie" v-bind:isEnabled="nomSerie != ''" />
     </StackLayout>
   </Page>
 </template>
@@ -24,7 +20,7 @@ export default {
       nomVille: "",
       latitudeVille: "",
       longitudeVille: "",
-      postBody: ""
+      postBody: "",
     };
   },
   methods: {
@@ -51,3 +47,25 @@ export default {
   }
 };
 </script>
+
+<style>
+label{
+  margin-top: 10px;
+  text-align: center;
+  color: black;
+  font-size: 20pt;
+}
+
+/*.textField::selection{
+  color:#FEAF37;
+}*/
+
+.textField{
+  margin: 20px;
+}
+
+.content{
+  width:90%;
+}
+
+</style>

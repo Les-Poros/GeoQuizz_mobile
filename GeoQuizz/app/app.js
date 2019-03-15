@@ -1,4 +1,4 @@
-/* app.js a utiliser avec le dossier router*/
+
 import Vue from "nativescript-vue";
 
 import router from "./router";
