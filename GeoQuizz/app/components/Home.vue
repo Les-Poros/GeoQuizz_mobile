@@ -1,13 +1,15 @@
 <template>
   <Page>
     <ActionBar title="Geo Quizz"/>
-    <StackLayout>
-      <label text="Série :"></label>
-      <ListPicker :items="getListOfSeries" v-model="position" v-if="estCompleteListe"></ListPicker>
-      <Button text="Prendre une photo" @tap="redirectToPicture" v-bind:isEnabled="position != 0"/>
-      <label text="ou :"></label>
-      <Button text="Créer une série" @tap="$goTo('serie')"/>
-    </StackLayout>
+      <ScrollView orientation="vertical">
+        <StackLayout class="content" orientation="vertical">
+          <Image id="logo" src="~/logo.png" width="150" height="150"/>
+          <ListPicker :items="getListOfSeries" v-model="position" v-if="estCompleteListe"></ListPicker>
+          <Button text="Prendre une photo" @tap="redirectToPicture" v-bind:isEnabled="position != 0"/>
+          <label class="homeLabel" text="ou :"></label>
+          <Button text="Créer une zone" @tap="$goTo('serie')"/>
+        </StackLayout>
+      </ScrollView>
   </Page>
 </template>
 
@@ -32,7 +34,7 @@ export default {
   },
   computed: {
     getListOfSeries: function() {
-      let listVilles = ["Choisissez une ville"];
+      let listVilles = ["Choisissez une zone"];
       this.listOfItems.forEach(item => {
         listVilles.push(item["ville"]);
       });
@@ -56,3 +58,26 @@ export default {
   }
 };
 </script>
+
+<style>
+.homeLabel{
+  text-align: center;
+  color: black;
+  font-size: 20pt;
+}
+
+.content{
+  width:80%;
+}
+
+#logo{
+  margin: 50px;
+  margin-bottom: 20px;
+}
+
+Button{
+  margin: 20px;
+  background-color: #FEAF37;
+  border-radius: 15px;
+}
+</style>
