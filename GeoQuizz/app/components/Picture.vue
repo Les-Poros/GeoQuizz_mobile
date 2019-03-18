@@ -9,7 +9,7 @@
         <label v-if="!connection" textWrap="true">Vous êtes hors connexion. Vous ne pouvez pas envoyer de photos !</label>
         <template id="modal" v-if="modalActive">
           <StackLayout class="p-20" backgroundColor="white">
-            <Image :src="imgModal['src']" width="200" height="200"/>
+            <Image class="images" :src="imgModal['src']" width="200" height="200"/>
             <label>latitude : {{imgModal['loc']['lat']}}</label>
             <TextField class="textField" v-model="newLat" hint="latitude"/>
             <label>longitude : {{imgModal['loc']['long']}}</label>
@@ -63,6 +63,7 @@ export default {
       newLat: '',
       newLong: '',
       missLocation: false,
+      compteurIndex: -1,
     };
   },
   methods: {
@@ -89,10 +90,12 @@ export default {
             let img = new Image();
             img.src = selected;
 
-            let index = this.images.length;
+            let index = this.compteurIndex +1;
 
             let tabImage = { src: selected, loc: {lat: "", long: ""}, index: index, extension: ext };
             this.images.push(tabImage);
+
+            this.compteurIndex += 1;
 
             this.showModal(tabImage);
 
@@ -127,11 +130,13 @@ export default {
               let img = new Image();
               img.src = imageAsset;
 
-              let index = this.images.length;
+            let index = this.compteurIndex +1;
 
               let tabImage = {src: imageAsset, loc: this.localisation, index: index, extension: ext };
               this.images.push(tabImage);
               
+            this.compteurIndex += 1;
+
               this.showModal(tabImage);
 
               this.isEmptyImages();
@@ -219,8 +224,13 @@ export default {
     },
     removeImage(img) {
       // Méthode qui supprime la photo séléctionnée
-      this.images.splice(img["index"], 1);
-      /////////////////////////////////////////////VERIFIER SUPPRESSION DANS LE TABLEAU//////////////////////////////////////////////////////////////
+      var index = '';
+      for(var i=0; i < this.images.length; i++){
+        if(this.images[i]['src'] == img['src']){
+          index = i;
+        }
+      }
+      this.images.splice(index, 1);
       this.modalActive = false;
       this.imgModal = "";
       this.newLat = '';
@@ -254,3 +264,9 @@ export default {
   }
 };
 </script>
+
+<style>
+  .images{
+    margin: 5px;
+  }
+</style>
