@@ -25,6 +25,7 @@
         </WrapLayout>
         <!--<label v-for="img in imagesAvecLoc" :text="img['loc']['lat']" ></label>-->
         <Button text="Envoyer les photos" @tap="sendPictures()" v-bind:isEnabled="hasPicture" v-if="connection"/>
+        <label v-if="missLocation" text="Au moins une de vos photos n'a pas de géolocalisation" textWrap="true"></label>
 
         <!--<label v-for="i in images">{{i['index']}}</label>-->
       </StackLayout>
@@ -61,6 +62,7 @@ export default {
       idPhoto: "",
       newLat: '',
       newLong: '',
+      missLocation: false,
     };
   },
   methods: {
@@ -169,9 +171,11 @@ export default {
         this.images.forEach(img => {
           if(img['loc']['lat'] !='' && img['loc']['long'] != ''){
             this.hasPicture = true;
+            this.missLocation = false;
           }
           else{
             this.hasPicture = false;
+            this.missLocation = true;
           }
         });
       }
