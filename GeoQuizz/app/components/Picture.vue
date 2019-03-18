@@ -10,6 +10,11 @@
         <template id="modal" v-if="modalActive">
           <StackLayout class="p-20" backgroundColor="white">
             <Image :src="imgModal['src']" width="200" height="200"/>
+            <label>latitude : {{imgModal['loc']['lat']}}</label>
+            <TextField class="textField" v-model="newLat" hint="latitude"/>
+            <label>longitude : {{imgModal['loc']['long']}}</label>
+            <TextField class="textField" v-model="newLong" hint="longitude"/>
+            <Button class="btn btn-outline" text="Confirmer localisation" @tap="sendLocation(imgModal)"/>
             <Button class="btn btn-outline" text="Supprimer la photo" @tap="removeImage(imgModal)"/>
             <Button class="btn btn-outline" text="Fermer" @tap="closeModal()"/>
           </StackLayout>
@@ -53,12 +58,15 @@ export default {
       imgModal: "",
       connection: '',
       postBody: "",
-      idPhoto: ""
+      idPhoto: "",
+      newLat: '',
+      newLong: '',
     };
   },
   methods: {
     // Méthode qui permet de séléctionner une photo dans l'album
     selectPicture() {
+      this.closeModal()
       let context = imagepicker.create({
         mode: "multiple"
       });
@@ -92,6 +100,7 @@ export default {
         });
     },
     takePicture() {
+      this. closeModal()
       // Méthode qui permet de prendre une photo
       this.GetLocationTap();
       camera
@@ -189,6 +198,8 @@ export default {
       // Méthode qui ferme la modale
       this.modalActive = false;
       this.imgModal = "";
+      this.newLat = '';
+      this.newLong = '';
     },
     removeImage(img) {
       // Méthode qui supprime la photo séléctionnée
@@ -196,8 +207,19 @@ export default {
       /////////////////////////////////////////////VERIFIER SUPPRESSION DANS LE TABLEAU//////////////////////////////////////////////////////////////
       this.modalActive = false;
       this.imgModal = "";
+      this.newLat = '';
+      this.newLong = '';
       this.isEmptyImages();
     },
+    sendLocation(img){
+      var ind = img['index'];
+      if(this.newLat != '' ){
+        this.images[ind]['loc']['lat']=this.newLat;
+      }
+      if(this.newLong != ''){
+        this.images[ind]['loc']['long']=this.newLong;
+      }
+    }
   },
   created(){
     var myConn = getConnectionType();
