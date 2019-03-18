@@ -194,8 +194,7 @@ export default {
         this.postBody = {
           "latitude": image['loc']['lat'],
           "longitude": image['loc']['long'],
-          "desc": "",
-          "url": image['extension']
+          "desc": ""
         };
         axios
           .post("https://lesporos.pagekite.me/series/"+this.idZone+"/photos", this.postBody, {
@@ -205,7 +204,15 @@ export default {
         })
         .then(response => {
           this.idPhoto = response.data.id;
-          /*axios.put("https://lesporos.pagekite.me/series/"+this.idZone+"/photos/"+this.idPhoto)*/
+          this.putBody = {
+            "url": "http://res.cloudinary.com/lesporos/image/upload/"+this.idPhoto+".jpg",
+          };
+          axios
+            .put("https://lesporos.pagekite.me/series/"+this.idZone+"/photos/"+this.idPhoto, this.putBody, {
+            headers: {
+              "Content-Type": "application/json"
+            },
+          });
         });
       });
     },
