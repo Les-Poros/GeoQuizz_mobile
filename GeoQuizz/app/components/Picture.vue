@@ -92,6 +92,8 @@ export default {
             let tabImage = { src: selected, loc: {lat: "", long: ""}, index: index, extension: ext };
             this.images.push(tabImage);
 
+            this.showModal(tabImage);
+
             this.isEmptyImages();
           });
         })
@@ -127,6 +129,8 @@ export default {
 
               let tabImage = {src: imageAsset, loc: this.localisation, index: index, extension: ext };
               this.images.push(tabImage);
+              
+              this.showModal(tabImage);
 
               this.isEmptyImages();
               console.log("ive got " + this.images.length + " images now.");
@@ -162,7 +166,14 @@ export default {
     // Méthode qui permet d'activer ou désactiver le bouton envoyer
     isEmptyImages() {
       if (this.images.length != 0) {
-        this.hasPicture = true;
+        this.images.forEach(img => {
+          if(img['loc']['lat'] !='' && img['loc']['long'] != ''){
+            this.hasPicture = true;
+          }
+          else{
+            this.hasPicture = false;
+          }
+        });
       }
       else{
         this.hasPicture = false;
@@ -191,6 +202,7 @@ export default {
     },
     // Méthode qui ouvre une modale avec l'image
     showModal(img) {
+      this.isEmptyImages();
       this.modalActive = true;
       this.imgModal = img;
     },
@@ -219,6 +231,7 @@ export default {
       if(this.newLong != ''){
         this.images[ind]['loc']['long']=this.newLong;
       }
+      this.isEmptyImages();
     }
   },
   created(){
