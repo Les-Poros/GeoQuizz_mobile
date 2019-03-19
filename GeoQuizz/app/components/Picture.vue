@@ -90,8 +90,6 @@ export default {
 
             let index = this.compteurIndex +1;
 
-            this.compteurIndex += 1;
-
             let form = new FormData();
             let imgSrc = new ImageSource();
             imgSrc.fromAsset(selected).then(img => {
@@ -115,13 +113,14 @@ export default {
                 xhr.onload = () => {
                   let jsonXHR = JSON.parse(xhr.responseText);
                   this.idPhoto = jsonXHR.public_id;
-                  let tabImage = {src: imageAsset, loc: this.localisation, index: index, idPhoto: this.idPhoto };
+                  let tabImage = {src: selected, loc: {lat: "", long: ""}, index: index, idPhoto: this.idPhoto };
                   this.images.push(tabImage);
                   this.showModal(tabImage);
                 };
                 xhr.send(form);
 
-                console.log(this.images);
+                //console.log(this.images);
+                this.compteurIndex += 1;
               });
 
             this.isEmptyImages();
@@ -155,8 +154,6 @@ export default {
 
               let index = this.compteurIndex +1;
 
-              this.compteurIndex += 1;
-
               let form = new FormData();
               let imgSrc = new ImageSource();
               
@@ -188,6 +185,7 @@ export default {
                 xhr.send(form);
 
                 console.log(this.images);
+                this.compteurIndex += 1;
               });
               this.isEmptyImages();
               console.log("ive got " + this.images.length + " images now.");
