@@ -34,7 +34,6 @@
 </template>
 
 
-
 <script>
 import * as camera from "nativescript-camera";
 import * as imagepicker from "nativescript-imagepicker";
@@ -46,7 +45,8 @@ var geolocation = require("nativescript-geolocation");
 import axios from "axios";
 
 import { connectionType, getConnectionType, startMonitoring, stopMonitoring }from "tns-core-modules/connectivity";
-
+import { ImageSource, formFile, fromResource, fromBase64 } from 'tns-core-modules/image-source';
+import CryptoJS from "crypto-js";
 
 export default {
   props: ["idZone", "url", "nom" ],
@@ -82,22 +82,47 @@ export default {
         .then(selection => {
           selection.forEach(selected => {
 
-            let jsonImg = JSON.stringify(selected);
-            let storageImage = Object.values(selected).slice(-1)[0];
-            var splitImage = storageImage.split('.');
-            let ext = '.'+splitImage[splitImage.length-1];
+            /*let jsonImg = JSON.stringify(selected);
+            let storageImage = Object.values(selected).slice(-1)[0];*/
 
             let img = new Image();
             img.src = selected;
 
             let index = this.compteurIndex +1;
 
-            let tabImage = { src: selected, loc: {lat: "", long: ""}, index: index, extension: ext };
-            this.images.push(tabImage);
-
             this.compteurIndex += 1;
 
-            this.showModal(tabImage);
+            let form = new FormData();
+            let imgSrc = new ImageSource();
+            imgSrc.fromAsset(selected).then(img => {
+                let img64Base = img.toBase64String("jpeg", 70);
+                let detailsFile = "data:image/jpeg;base64,"+img64Base;
+                let timestamps = ((Date.now() / 1000) | 0).toString();
+                let keyAPI = "414295376186362";
+                let secretAPI = "8nzZYlAX-zeo6k-Z8XNANXypq38";
+                let cloudName = "lesporos";
+                let stringHash = "timestamp="+timestamps+secretAPI;
+                let signature = CryptoJS.SHA1(stringHash).toString();
+                let urlUpload = "https://api.cloudinary.com/v1_1/"+cloudName+"/image/upload";
+
+                form.append("file", detailsFile);
+                form.append("timestamp", timestamps);
+                form.append("api_key", keyAPI);
+                form.append("signature", signature);
+
+                let xhr = new XMLHttpRequest();
+                xhr.open("POST", urlUpload);
+                xhr.onload = () => {
+                  let jsonXHR = JSON.parse(xhr.responseText);
+                  this.idPhoto = jsonXHR.public_id;
+                  let tabImage = {src: imageAsset, loc: this.localisation, index: index, idPhoto: this.idPhoto };
+                  this.images.push(tabImage);
+                  this.showModal(tabImage);
+                };
+                xhr.send(form);
+
+                console.log(this.images);
+              });
 
             this.isEmptyImages();
           });
@@ -122,23 +147,48 @@ export default {
             })
             .then(imageAsset => {
               
-              let jsonImg = JSON.stringify(imageAsset);
-              let storageImage = Object.values(imageAsset).slice(-1)[0];
-              var splitImage = storageImage.split('.');
-              let ext = '.'+splitImage[splitImage.length-1];
+              /*let jsonImg = JSON.stringify(imageAsset);
+              let storageImage = Object.values(imageAsset).slice(-1)[0];*/
 
               let img = new Image();
               img.src = imageAsset;
 
-            let index = this.compteurIndex +1;
+              let index = this.compteurIndex +1;
 
-              let tabImage = {src: imageAsset, loc: this.localisation, index: index, extension: ext };
-              this.images.push(tabImage);
+              this.compteurIndex += 1;
+
+              let form = new FormData();
+              let imgSrc = new ImageSource();
               
-            this.compteurIndex += 1;
+              imgSrc.fromAsset(imageAsset).then(img => {
+                let img64Base = img.toBase64String("jpeg", 70);
+                let detailsFile = "data:image/jpeg;base64,"+img64Base;
+                let timestamps = ((Date.now() / 1000) | 0).toString();
+                let keyAPI = "414295376186362";
+                let secretAPI = "8nzZYlAX-zeo6k-Z8XNANXypq38";
+                let cloudName = "lesporos";
+                let stringHash = "timestamp="+timestamps+secretAPI;
+                let signature = CryptoJS.SHA1(stringHash).toString();
+                let urlUpload = "https://api.cloudinary.com/v1_1/"+cloudName+"/image/upload";
 
-              this.showModal(tabImage);
+                form.append("file", detailsFile);
+                form.append("timestamp", timestamps);
+                form.append("api_key", keyAPI);
+                form.append("signature", signature);
 
+                let xhr = new XMLHttpRequest();
+                xhr.open("POST", urlUpload);
+                xhr.onload = () => {
+                  let jsonXHR = JSON.parse(xhr.responseText);
+                  this.idPhoto = jsonXHR.public_id;
+                  let tabImage = {src: imageAsset, loc: this.localisation, index: index, idPhoto: this.idPhoto };
+                  this.images.push(tabImage);
+                  this.showModal(tabImage);
+                };
+                xhr.send(form);
+
+                console.log(this.images);
+              });
               this.isEmptyImages();
               console.log("ive got " + this.images.length + " images now.");
             })
@@ -197,18 +247,17 @@ export default {
           "desc": ""
         };
         axios
-          .post("https://lesporos.pagekite.me/series/"+this.idZone+"/photos", this.postBody, {
+          .post("https://mobile-lesporos.pagekite.me/series/"+this.idZone+"/photos", this.postBody, {
           headers: {
             "Content-Type": "application/json"
           },
         })
         .then(response => {
-          this.idPhoto = response.data.id;
           this.putBody = {
-            "url": "http://res.cloudinary.com/lesporos/image/upload/"+this.idPhoto+".jpg",
+            "url": "http://res.cloudinary.com/lesporos/image/upload/"+image.idPhoto+".jpg",
           };
           axios
-            .put("https://lesporos.pagekite.me/series/"+this.idZone+"/photos/"+this.idPhoto, this.putBody, {
+            .put("https://mobile-lesporos.pagekite.me/series/"+this.idZone+"/photos/"+image.idPhoto, this.putBody, {
             headers: {
               "Content-Type": "application/json"
             },

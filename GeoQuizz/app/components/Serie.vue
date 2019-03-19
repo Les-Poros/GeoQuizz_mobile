@@ -37,14 +37,14 @@ export default {
         "dist": 500
       };
       axios
-        .post("https://lesporos.pagekite.me/series/", this.postBody, {
+        .post("https://mobile-lesporos.pagekite.me/series/", this.postBody, {
           headers: {
             "Content-Type": "application/json"
           },
         })
         .then(response => {
           this.idSerie = response.data.id;
-          this.link = "http://lesporos.pagekite.me/series/"+this.idZone;
+          this.link = "https://mobile-lesporos.pagekite.me/series/"+this.idZone;
           this.$goTo("picture", { props: { idZone: this.idZone, url: this.link, nom: this.nomZone }});
         })
         .catch(error => {

@@ -9,6 +9,7 @@
           <Button text="Prendre une photo" @tap="redirectToPicture" v-bind:isEnabled="position != 0"/>
           <label class="homeLabel" text="ou :"></label>
           <Button text="Créer une zone" @tap="$goTo('serie')" v-bind:isEnabled='connection == true'/>
+          <!---->
         </StackLayout>
       </ScrollView>
   </Page>
@@ -58,7 +59,7 @@ export default {
       else{
         this.connection = true;
         axios
-          .get("https://lesporos.pagekite.me/series")
+          .get("https://mobile-lesporos.pagekite.me/series")
           .then(response => {
             let contentSerie = response.data.content;
             contentSerie.forEach(content => {
@@ -84,7 +85,7 @@ export default {
 }
 
 .content{
-  width:80%;
+  width: 80%;
 }
 
 #logo{
