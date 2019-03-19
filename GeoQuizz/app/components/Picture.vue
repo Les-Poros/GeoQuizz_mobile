@@ -59,17 +59,17 @@ export default {
       imgModal: "",
       connection: '',
       postBody: "",
-      idPhoto: "",
       newLat: '',
       newLong: '',
       missLocation: false,
       compteurIndex: -1,
+      idPhoto: ''
     };
   },
   methods: {
     // Méthode qui permet de séléctionner une photo dans l'album
     selectPicture() {
-      this.closeModal()
+      this.closeModal();
       let context = imagepicker.create({
         mode: "multiple"
       });
@@ -90,36 +90,14 @@ export default {
 
             let index = this.compteurIndex +1;
 
-            let form = new FormData();
             let imgSrc = new ImageSource();
             imgSrc.fromAsset(selected).then(img => {
                 let img64Base = img.toBase64String("jpeg", 70);
                 let detailsFile = "data:image/jpeg;base64,"+img64Base;
-                let timestamps = ((Date.now() / 1000) | 0).toString();
-                let keyAPI = "414295376186362";
-                let secretAPI = "8nzZYlAX-zeo6k-Z8XNANXypq38";
-                let cloudName = "lesporos";
-                let stringHash = "timestamp="+timestamps+secretAPI;
-                let signature = CryptoJS.SHA1(stringHash).toString();
-                let urlUpload = "https://api.cloudinary.com/v1_1/"+cloudName+"/image/upload";
-
-                form.append("file", detailsFile);
-                form.append("timestamp", timestamps);
-                form.append("api_key", keyAPI);
-                form.append("signature", signature);
-
-                let xhr = new XMLHttpRequest();
-                xhr.open("POST", urlUpload);
-                xhr.onload = () => {
-                  let jsonXHR = JSON.parse(xhr.responseText);
-                  this.idPhoto = jsonXHR.public_id;
-                  let tabImage = {src: selected, loc: {lat: "", long: ""}, index: index, idPhoto: this.idPhoto };
-                  this.images.push(tabImage);
-                  this.showModal(tabImage);
-                };
-                xhr.send(form);
-
-                //console.log(this.images);
+                let tabImage = {src: selected, loc: {lat: "", long: ""}, index: index, details: detailsFile };
+                this.images.push(tabImage);
+                this.showModal(tabImage);
+                
                 this.compteurIndex += 1;
               });
 
@@ -131,9 +109,9 @@ export default {
         });
     },
     takePicture() {
-      this. closeModal()
+      this.closeModal();
       // Méthode qui permet de prendre une photo
-      this.GetLocationTap();
+      this.getLocationTap();
       camera
         .requestPermissions()
         .then(() => {
@@ -154,41 +132,19 @@ export default {
 
               let index = this.compteurIndex +1;
 
-              let form = new FormData();
               let imgSrc = new ImageSource();
               
               imgSrc.fromAsset(imageAsset).then(img => {
                 let img64Base = img.toBase64String("jpeg", 70);
                 let detailsFile = "data:image/jpeg;base64,"+img64Base;
-                let timestamps = ((Date.now() / 1000) | 0).toString();
-                let keyAPI = "414295376186362";
-                let secretAPI = "8nzZYlAX-zeo6k-Z8XNANXypq38";
-                let cloudName = "lesporos";
-                let stringHash = "timestamp="+timestamps+secretAPI;
-                let signature = CryptoJS.SHA1(stringHash).toString();
-                let urlUpload = "https://api.cloudinary.com/v1_1/"+cloudName+"/image/upload";
-
-                form.append("file", detailsFile);
-                form.append("timestamp", timestamps);
-                form.append("api_key", keyAPI);
-                form.append("signature", signature);
-
-                let xhr = new XMLHttpRequest();
-                xhr.open("POST", urlUpload);
-                xhr.onload = () => {
-                  let jsonXHR = JSON.parse(xhr.responseText);
-                  this.idPhoto = jsonXHR.public_id;
-                  let tabImage = {src: imageAsset, loc: this.localisation, index: index, idPhoto: this.idPhoto };
-                  this.images.push(tabImage);
-                  this.showModal(tabImage);
-                };
-                xhr.send(form);
-
-                console.log(this.images);
+                let tabImage = {src: imageAsset, loc: this.localisation, index: index, details: detailsFile };
+                this.images.push(tabImage);
+                this.showModal(tabImage);
+                
                 this.compteurIndex += 1;
               });
+
               this.isEmptyImages();
-              console.log("ive got " + this.images.length + " images now.");
             })
             .catch(e => {
               console.log("error:", e);
@@ -199,7 +155,7 @@ export default {
         });
     },
     // Méthode qui permet de géolocaliser le portable
-    GetLocationTap() {
+    getLocationTap() {
       var self = this;
       var lat = 0;
       var long = 0;
@@ -212,7 +168,6 @@ export default {
           timeout: 20000
         })
         .then(function(location) {
-          //alert("Current location is: " + location.latitude + " " + location.longitude);
           lat = location.latitude;
           long = location.longitude;
           self.localisation = { lat: lat, long: long };
@@ -239,28 +194,7 @@ export default {
     // Méthode qui va envoyer les photos à la série
     sendPictures() {
       this.images.forEach(image => {
-        this.postBody = {
-          "latitude": image['loc']['lat'],
-          "longitude": image['loc']['long'],
-          "desc": ""
-        };
-        axios
-          .post("https://mobile-lesporos.pagekite.me/series/"+this.idZone+"/photos", this.postBody, {
-          headers: {
-            "Content-Type": "application/json"
-          },
-        })
-        .then(response => {
-          this.putBody = {
-            "url": "http://res.cloudinary.com/lesporos/image/upload/"+image.idPhoto+".jpg",
-          };
-          axios
-            .put("https://mobile-lesporos.pagekite.me/series/"+this.idZone+"/photos/"+image.idPhoto, this.putBody, {
-            headers: {
-              "Content-Type": "application/json"
-            },
-          });
-        });
+        this.uploadFile(image);        
       });
     },
     // Méthode qui ouvre une modale avec l'image
@@ -300,6 +234,46 @@ export default {
         this.images[ind]['loc']['long']=this.newLong;
       }
       this.isEmptyImages();
+    },
+    uploadFile(detailsFile) {
+      let form = new FormData();
+      let timestamps = ((Date.now() / 1000) | 0).toString();
+      let keyAPI = "414295376186362";
+      let secretAPI = "8nzZYlAX-zeo6k-Z8XNANXypq38";
+      let cloudName = "lesporos";
+      let stringHash = "timestamp="+timestamps+secretAPI;
+      let signature = CryptoJS.SHA1(stringHash).toString();
+      let urlUpload = "https://api.cloudinary.com/v1_1/"+cloudName+"/image/upload";
+
+      form.append("file", detailsFile['details']);
+      form.append("timestamp", timestamps);
+      form.append("api_key", keyAPI);
+      form.append("signature", signature);
+
+      let xhr = new XMLHttpRequest();
+      xhr.open("POST", urlUpload);
+      xhr.onload = () => {
+        let jsonXHR = JSON.parse(xhr.responseText);
+        let idPublicCloud = jsonXHR.public_id;
+        this.postBody = {
+          "latitude": detailsFile['loc']['lat'],
+          "longitude": detailsFile['loc']['long'],
+          "desc": "",
+          "url": "http://res.cloudinary.com/lesporos/image/upload/"+idPublicCloud+".jpg",
+        };
+        axios
+          .post("https://mobile-lesporos.pagekite.me/series/"+this.idZone+"/photos", this.postBody, {
+          headers: {
+            "Content-Type": "application/json"
+          },
+        })
+        .then(response => {
+          console.log(response);
+      this.closeModal();
+          this.images = [];
+        });
+      };
+      xhr.send(form);
     }
   },
   created(){

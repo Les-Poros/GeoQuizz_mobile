@@ -35,7 +35,7 @@ export default {
     redirectToPicture: function() {
       let idSerie = this.listOfItems[this.position - 1]["id"];
       let nomZone = this.listOfItems[this.position - 1]["ville"];
-      this.$goTo("picture", { props: { idVille: idSerie, url: this.url , nom: nomZone} });
+      this.$goTo("picture", { props: { idZone: idSerie, url: this.url , nom: nomZone} });
     }
   },
   computed: {
