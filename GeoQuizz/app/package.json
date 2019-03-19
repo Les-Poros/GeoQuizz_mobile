@@ -2,5 +2,8 @@
   "main": "app.js",
   "android": {
     "v8Flags": "--expose_gc"
+  },
+  "dependencies": {
+    "crypto-js":"^3.1.9-1"
   }
 }
