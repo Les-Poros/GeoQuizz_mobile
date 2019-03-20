@@ -2,14 +2,14 @@
   <Page>
     <ActionBar title="Geo Quizz"/>
     <ScrollView orientation="vertical">
-      <StackLayout orientation="vertical">
+      <StackLayout orientation="vertical" class="content">
         <label>Zone : {{nomZone}}</label>
         <Button text="Prendre une photo" @tap="takePicture"/>
         <Button text="Choisir une photo" @tap="selectPicture"/>
         <label v-if="!estConnecte" textWrap="true">Vous êtes hors connexion. Vous ne pouvez pas envoyer de photos !</label>
         <template id="modal" v-if="modalActive">
           <StackLayout class="p-20" backgroundColor="white">
-            <Image class="images" :src="imgModal['src']" width="200" height="200"/>
+            <Image :src="imgModal['src']" width="200" height="200"/>
             <label>latitude : {{imgModal['loc']['lat']}}</label>
             <TextField class="textField" v-model="newLat" hint="latitude"/>
             <label>longitude : {{imgModal['loc']['long']}}</label>
@@ -20,7 +20,7 @@
           </StackLayout>
         </template>
         <WrapLayout>
-          <Image v-for="img in images" :src="img['src']" width="75" height="75" @tap="showModal(img)" />
+          <Image v-for="img in images" :src="img['src']" width="75" height="75" @tap="showModal(img)" class="images"/>
         </WrapLayout>
         <Button text="Envoyer les photos" @tap="sendPictures" v-bind:isEnabled="hasPicture" v-if="estConnecte"/>
         <label v-if="missLocation" text="Au moins une de vos photos n'a pas de géolocalisation" textWrap="true"></label>
@@ -272,7 +272,6 @@ export default {
           this.closeModal();
           this.images = [];
           this.load = false;
-          console.log(this.load);
         });
       };
       xhr.send(form);
@@ -297,6 +296,7 @@ export default {
 
 <style>
   .images{
-    margin: 5px;
+    margin-left: 5px;
+    margin-right: 5px;
   }
 </style>

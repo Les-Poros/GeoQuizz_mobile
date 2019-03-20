@@ -8,6 +8,7 @@
       <TextField class="textField" v-model="longitudeZone" hint="Longitude de la zone"/>
       <label v-if="!estConnecte" textWrap="true">Vous êtes hors connexion. Vous ne pouvez pas créer de séries !</label>
       <Button text="Créer la zone et ajouter des photos" @tap="createZone" v-bind:isEnabled="nomZone != ''" />
+      <ActivityIndicator v-bind:busy="load" class="spinner"/>
     </StackLayout>
   </Page>
 </template>
@@ -24,6 +25,7 @@ export default {
       idZone: '',
       latitudeZone: '',
       linkZone: '',
+      load: true,
       longitudeZone: '',
       nomZone: '',
       postBody: '',
@@ -35,6 +37,7 @@ export default {
       // Méthode qui crée une zone dans la base de données de notre API
       // params : aucun
       // return : rien
+      this.load = true;
       this.postBody = {
         "ville": this.nomZone,
         "map_lat": this.latitudeZone,
