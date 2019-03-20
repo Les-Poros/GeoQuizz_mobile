@@ -13,7 +13,9 @@
             <TextField class="textField" v-model="newLat" hint="latitude"/>
             <label>longitude : {{imgModal['loc']['long']}}</label>
             <TextField class="textField" v-model="newLong" hint="longitude"/>
-            <Button class="btn btn-outline" text="Confirmer localisation" @tap="sendLocation(imgModal)"/>
+            <label>description :{{imgModal['descr']}} </label>
+            <TextField class="textField" v-model="newdescr" hint="description"/>
+            <Button class="btn btn-outline" text="Confirmer Info" @tap="sendLocation(imgModal)"/>
             <Button class="btn btn-outline" text="Supprimer la photo" @tap="removeImage(imgModal)"/>
             <Button class="btn btn-outline" text="Fermer" @tap="closeModal"/>
           </StackLayout>
@@ -64,6 +66,7 @@ export default {
       newLat: '',
       newLong: '',
       postBody: '',
+      newdescr:'',
       isSend: false
     };
   },
@@ -93,7 +96,7 @@ export default {
             imgSrc.fromAsset(selected).then(img => {
                 let img64Base = img.toBase64String("jpeg", 70);
                 let detailsFile = "data:image/jpeg;base64,"+img64Base;
-                let tabImage = {src: selected, loc: {lat: "", long: ""}, index: index, details: detailsFile };
+                let tabImage = {src: selected, loc: {lat: "", long: ""},descr:"", index: index, details: detailsFile };
                 this.images.push(tabImage);
                 this.showModal(tabImage);
                 
@@ -222,6 +225,7 @@ export default {
       this.imgModal = "";
       this.newLat = '';
       this.newLong = '';
+      this.newdescr = '';
     },
     removeImage(img) {
       // Méthode qui supprime la photo séléctionnée
@@ -238,6 +242,7 @@ export default {
       this.imgModal = "";
       this.newLat = '';
       this.newLong = '';
+      this.newdescr = '';
       this.isEmptyImages();
     },
     sendLocation(img){
@@ -256,7 +261,11 @@ export default {
       if(this.newLong != ''){
         this.images[ind]['loc']['long']=this.newLong;
       }
+      if(this.newdescr != '' ){
+        this.images[ind]['descr']=this.newdescr;
+      }
       this.isEmptyImages();
+      this.closeModal();
     },
     uploadFile(detailsFile) {
       // Méthode qui permet d'uploader une image sur Cloudinary
@@ -283,7 +292,7 @@ export default {
         this.postBody = {
           "latitude": detailsFile['loc']['lat'],
           "longitude": detailsFile['loc']['long'],
-          "desc": "",
+          "descr": detailsFile['descr'],
           "url": jsonXHR.secure_url,
         };
         axios
