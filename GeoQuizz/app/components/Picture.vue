@@ -107,8 +107,10 @@ export default {
         });
     },
     takePicture() {
+      // Méthode qui permet de prendre une photo depuis l'appareil photo d'un portable
+      // params : aucun
+      // return : rien
       this.closeModal();
-      // Méthode qui permet de prendre une photo
       this.getLocationTap();
       camera
         .requestPermissions()
@@ -147,8 +149,10 @@ export default {
           console.log("Error requesting permission");
         });
     },
-    // Méthode qui permet de géolocaliser le portable
     getLocationTap() {
+      // Méthode qui permet de géolocaliser le portable
+      // params : aucun
+      // return : rien
       var self = this;
       var lat = 0;
       var long = 0;
@@ -166,8 +170,10 @@ export default {
           self.localisation = { lat: lat, long: long };
         });
     },
-    // Méthode qui permet d'activer ou désactiver le bouton envoyer
     isEmptyImages() {
+      // Méthode qui permet d'activer ou désactiver le bouton envoyer
+      // params : aucun
+      // return : rien
       if (this.images.length != 0) {
         this.images.forEach(img => {
           if(img['loc']['lat'] !='' && img['loc']['long'] != ''){
@@ -184,8 +190,10 @@ export default {
         this.hasPicture = false;
       }
     },
-    // Méthode qui va envoyer les photos à la série
     sendPictures() {
+      // Méthode qui va envoyer les photos à la série
+      // params : aucun
+      // return : rien
       this.isSend = true;
       this.images.forEach(image => {
         if (this.estConnecte == true) {
@@ -198,14 +206,18 @@ export default {
         }      
       });
     },
-    // Méthode qui ouvre une modale avec l'image
     showModal(img) {
+      // Méthode qui ouvre une fenêtre modale avec une image
+      // params : img = image que l'on a sélectionnée
+      // return : rien
       this.isEmptyImages();
       this.modalActive = true;
       this.imgModal = img;
     },
     closeModal() {
-      // Méthode qui ferme la modale
+      // Méthode qui ferme la fenêtre modale
+      // params : aucun
+      // return : rien
       this.modalActive = false;
       this.imgModal = "";
       this.newLat = '';
@@ -213,6 +225,8 @@ export default {
     },
     removeImage(img) {
       // Méthode qui supprime la photo séléctionnée
+      // params : img = image que l'on a sélectionnée
+      // return : rien
       var index = '';
       for(var i=0; i < this.images.length; i++){
         if(this.images[i]['src'] == img['src']){
@@ -227,6 +241,9 @@ export default {
       this.isEmptyImages();
     },
     sendLocation(img){
+      // Méthode qui permet de modifie et d'envoyer une nouvelle localisation pour une image
+      // params : img = image pour laquelle on souhaite modifier ses coordonnées GPS
+      // return : rien
       var ind = '';
       for(var i=0; i < this.images.length; i++){
         if(this.images[i]['src'] == img['src']){
@@ -242,6 +259,9 @@ export default {
       this.isEmptyImages();
     },
     uploadFile(detailsFile) {
+      // Méthode qui permet d'uploader une image sur Cloudinary
+      // params : detailsFile = les détails de l'image que l'on souhaite envoyer
+      // return : rien
       this.load = true;
       let form = new FormData();
       let timestamps = ((Date.now() / 1000) | 0).toString();

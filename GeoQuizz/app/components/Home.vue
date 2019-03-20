@@ -46,7 +46,7 @@ export default {
     getListOfSeries: function() {
       // Méthode qui crée la liste des zones et la retourne
       // params : aucun
-      // return : la liste de toutes les zones de notre API
+      // return : la liste de toutes les zones de GeoQuizz
       let listZones = ["Choisissez une zone"];
       this.listOfZones.forEach(item => {
         listZones.push(item["zone"]);
@@ -68,7 +68,7 @@ export default {
       }
     });
         axios
-          .get("https://mobile-lesporos.pagekite.me/series")
+          .get(this.urlZone+"series")
           .then(response => {
             let contentSerie = response.data.content;
             contentSerie.forEach(content => {

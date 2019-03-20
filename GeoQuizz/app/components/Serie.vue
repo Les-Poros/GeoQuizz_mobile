@@ -35,7 +35,7 @@ export default {
   },
   methods: {
     createZone() {
-      // Méthode qui crée une zone dans la base de données de notre API
+      // Méthode qui crée une zone dans la base de données de GeoQuizz
       // params : aucun
       // return : rien
       this.load = true;
