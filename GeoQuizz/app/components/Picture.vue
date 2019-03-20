@@ -38,7 +38,8 @@ import * as imagepicker from "nativescript-imagepicker";
 import axios from "axios";
 import CryptoJS from "crypto-js";
 
-import { Image } from "tns-core-modules/ui/image";import { ImageSource, formFile, fromResource, fromBase64 } from 'tns-core-modules/image-source';
+import { Image } from "tns-core-modules/ui/image";
+import { ImageSource, formFile, fromResource, fromBase64 } from 'tns-core-modules/image-source';
 import { connectionType, getConnectionType, startMonitoring, stopMonitoring }from "tns-core-modules/connectivity";
 import { isEnabled, enableLocationRequest, getCurrentLocation, watchLocation, distance, clearWatch } from "nativescript-geolocation";
 
