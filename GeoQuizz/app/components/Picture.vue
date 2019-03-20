@@ -38,6 +38,8 @@ import * as imagepicker from "nativescript-imagepicker";
 import axios from "axios";
 import CryptoJS from "crypto-js";
 
+import conf from "./conf/conf.json";
+
 import { Image } from "tns-core-modules/ui/image";
 import { ImageSource, fromFile, fromResource, fromBase64 } from 'tns-core-modules/image-source';
 import { connectionType, getConnectionType, startMonitoring, stopMonitoring }from "tns-core-modules/connectivity";
@@ -46,7 +48,7 @@ import { isEnabled, enableLocationRequest, getCurrentLocation, watchLocation, di
 var geolocation = require("nativescript-geolocation");
 
 export default {
-  props: ["idZone", "urlZone", "nomZone" ],
+  props: ["idZone", "urlZone", "nomZone"],
   data() {
     return {
       compteurIndex: -1,
@@ -81,10 +83,6 @@ export default {
         })
         .then(selection => {
           selection.forEach(selected => {
-
-            /*let jsonImg = JSON.stringify(selected);
-            let storageImage = Object.values(selected).slice(-1)[0];*/
-
             let img = new Image();
             img.src = selected;
 
@@ -100,7 +98,6 @@ export default {
                 
                 this.compteurIndex += 1;
               });
-
             this.isEmptyImages();
           });
         })
@@ -123,10 +120,6 @@ export default {
               saveToGallery: false
             })
             .then(imageAsset => {
-              
-              /*let jsonImg = JSON.stringify(imageAsset);
-              let storageImage = Object.values(imageAsset).slice(-1)[0];*/
-
               let img = new Image();
               img.src = imageAsset;
 
@@ -143,7 +136,6 @@ export default {
                 
                 this.compteurIndex += 1;
               });
-
               this.isEmptyImages();
             })
             .catch(e => {
@@ -244,18 +236,16 @@ export default {
       let timestamps = ((Date.now() / 1000) | 0).toString();
       let keyAPI = "414295376186362";
       let secretAPI = "8nzZYlAX-zeo6k-Z8XNANXypq38";
-      let cloudName = "lesporos";
-      let stringHash = "timestamp="+timestamps+secretAPI;
+      let stringHash = "timestamp="+timestamps+conf.secretAPI;
       let signature = CryptoJS.SHA1(stringHash).toString();
-      let urlUpload = "https://api.cloudinary.com/v1_1/"+cloudName+"/image/upload";
 
       form.append("file", detailsFile['details']);
       form.append("timestamp", timestamps);
-      form.append("api_key", keyAPI);
+      form.append("api_key", conf.keyAPI);
       form.append("signature", signature);
 
       let xhr = new XMLHttpRequest();
-      xhr.open("POST", urlUpload);
+      xhr.open("POST", conf.uploadURLToCloudinary);
       xhr.onload = () => {
         let jsonXHR = JSON.parse(xhr.responseText);
         let idPublicCloud = jsonXHR.public_id;
@@ -263,10 +253,10 @@ export default {
           "latitude": detailsFile['loc']['lat'],
           "longitude": detailsFile['loc']['long'],
           "desc": "",
-          "url": "http://res.cloudinary.com/lesporos/image/upload/"+idPublicCloud+".jpg",
+          "url": jsonXHR.secure_url,
         };
         axios
-          .post("https://mobile-lesporos.pagekite.me/series/"+this.idZone+"/photos", this.postBody, {
+          .post(this.urlZone+"series/"+this.idZone+"/photos", this.postBody, {
           headers: {
             "Content-Type": "application/json"
           },

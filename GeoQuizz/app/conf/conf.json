@@ -1,3 +1,6 @@
 {
-    "apiMobileURL": "https://mobile-lesporos.pagekite.me/"
+    "apiMobileURL": "https://mobile-lesporos.pagekite.me/",
+    "keyAPI": "414295376186362",
+    "secretAPI": "8nzZYlAX-zeo6k-Z8XNANXypq38",
+    "uploadURLToCloudinary" : "https://api.cloudinary.com/v1_1/lesporos/image/upload"
 }

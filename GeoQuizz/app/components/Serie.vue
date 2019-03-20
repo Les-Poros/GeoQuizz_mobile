@@ -19,6 +19,7 @@ import axios from "axios";
 import { connectionType, getConnectionType, startMonitoring, stopMonitoring }from "tns-core-modules/connectivity";
 
 export default {
+  props: ["urlZone"],
   data() {
     return {
       estConnecte: '',
@@ -45,14 +46,14 @@ export default {
         "dist": 100
       };
       axios
-        .post("https://mobile-lesporos.pagekite.me/series/", this.postBody, {
+        .post(this.urlZone+"series/", this.postBody, {
           headers: {
             "Content-Type": "application/json"
           },
         })
         .then(response => {
           this.idSerie = response.data.id;
-          this.linkZone = "https://mobile-lesporos.pagekite.me/series/"+this.idZone;
+          this.linkZone = this.urlZone+"series/"+this.idZone;
           this.$goTo("picture", { props: { idZone: this.idZone, urlZone: this.linkZone, nomZone: this.nomZone }});
         })
         .catch(error => {
@@ -84,10 +85,6 @@ label{
   color: black;
   font-size: 20pt;
 }
-
-/*.textField::selection{
-  color:#FEAF37;
-}*/
 
 .textField{
   margin: 20px;

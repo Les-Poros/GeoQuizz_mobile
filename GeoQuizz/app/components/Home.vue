@@ -9,7 +9,7 @@
           <ListPicker :items="getListOfSeries" v-model="position" v-if="estCompleteListe"></ListPicker>
           <Button text="Prendre une photo" @tap="redirectToPicture" v-bind:isEnabled="position != 0"/>
           <label class="homeLabel" text="ou :"></label>
-          <Button text="Créer une zone" @tap="$goTo('serie')" v-bind:isEnabled='estConnecte == true'/>
+          <Button text="Créer une zone" @tap="$goTo('serie', { props: { urlZone: urlZone} })" v-bind:isEnabled='estConnecte == true'/>
         </StackLayout>
       </ScrollView>
   </Page>
@@ -40,7 +40,7 @@ export default {
       let idZone = this.listOfZones[this.position - 1]["id"];
       let nomZone = this.listOfZones[this.position - 1]["zone"];
       this.$goTo("picture", { props: { idZone: idZone, urlZone: this.urlZone, nomZone: nomZone} });
-    }
+    }  
   },
   computed: {
     getListOfSeries: function() {
