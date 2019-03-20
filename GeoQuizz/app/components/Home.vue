@@ -3,70 +3,78 @@
     <ActionBar title="Geo Quizz"/>
       <ScrollView orientation="vertical">
         <StackLayout class="content" orientation="vertical">
-          <label v-if="!connection" textWrap="true">Vous êtes hors connexion. Vous ne pouvez pas prendre de photos et créer de séries !</label>
+          <label v-if="!estConnecte" textWrap="true">Vous êtes hors connexion. Vous ne pouvez pas prendre de photos et créer de séries !</label>
           <Image id="logo" src="~/logo.png" width="150" height="150"/>
+          <ActivityIndicator v-bind:busy="load" class="spinner"/>
           <ListPicker :items="getListOfSeries" v-model="position" v-if="estCompleteListe"></ListPicker>
           <Button text="Prendre une photo" @tap="redirectToPicture" v-bind:isEnabled="position != 0"/>
           <label class="homeLabel" text="ou :"></label>
-          <Button text="Créer une zone" @tap="$goTo('serie')" v-bind:isEnabled='connection == true'/>
-          <!---->
+          <Button text="Créer une zone" @tap="$goTo('serie')" v-bind:isEnabled='estConnecte == true'/>
         </StackLayout>
       </ScrollView>
   </Page>
 </template>
 
 <script>
+import axios from "axios";
+
 import { ListPicker } from "tns-core-modules/ui/list-picker";
 import { connectionType, getConnectionType, startMonitoring, stopMonitoring }from "tns-core-modules/connectivity";
 
-import axios from "axios";
-
 export default {
-  props: ["url"],
+  props: ["urlZone"],
   data() {
     return {
-      listOfItems: [],
-      position: 0,
+      estConnecte: '',
       estCompleteListe: true,
-      connection: ''
+      listOfZones: [],
+      load: true,
+      position: 0
     };
   },
   methods: {
     redirectToPicture: function() {
-      let idSerie = this.listOfItems[this.position - 1]["id"];
-      let nomZone = this.listOfItems[this.position - 1]["ville"];
-      this.$goTo("picture", { props: { idZone: idSerie, url: this.url , nom: nomZone} });
+      // Méthode qui redirige vers le component Picture
+      // params : aucun
+      // return : redirection vers le component Picture et son contenu
+      let idZone = this.listOfZones[this.position - 1]["id"];
+      let nomZone = this.listOfZones[this.position - 1]["zone"];
+      this.$goTo("picture", { props: { idZone: idZone, urlZone: this.urlZone, nomZone: nomZone} });
     }
   },
   computed: {
     getListOfSeries: function() {
-      let listVilles = ["Choisissez une zone"];
-      this.listOfItems.forEach(item => {
-        listVilles.push(item["ville"]);
+      // Méthode qui crée la liste des zones et la retourne
+      // params : aucun
+      // return : la liste de toutes les zones de notre API
+      let listZones = ["Choisissez une zone"];
+      this.listOfZones.forEach(item => {
+        listZones.push(item["zone"]);
       });
-      return listVilles;
+      return listZones;
     }
   },
   created() {
-    var myConn = getConnectionType();
-    if(myConn != connectionType.none){
-      this.connection = true;
+    var myConnectionType = getConnectionType();
+    if(myConnectionType != connectionType.none){
+      this.estConnecte = true;
     }
     startMonitoring((newConnectionType) => {
       if(newConnectionType == connectionType.none){
-        this.connection = false;
+        this.estConnecte = false;
       }
       else{
-        this.connection = true;
+        this.estConnecte = true;
         axios
           .get("https://mobile-lesporos.pagekite.me/series")
           .then(response => {
             let contentSerie = response.data.content;
             contentSerie.forEach(content => {
-              let city = { id: content.id, ville: content.ville };
-              this.listOfItems.push(city);
+              let zone = { id: content.id, zone: content.ville };
+              this.listOfZones.push(zone);
             });
             this.estCompleteListe = true;
+            this.load = false;
           })
           .catch(error => {
             console.log(error);
@@ -97,5 +105,9 @@ Button{
   margin: 20px;
   background-color: #FEAF37;
   border-radius: 15px;
+}
+
+.spinner{
+  color: #FEAF37;
 }
 </style>

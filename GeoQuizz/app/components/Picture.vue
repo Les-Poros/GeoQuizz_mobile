@@ -3,10 +3,10 @@
     <ActionBar title="Geo Quizz"/>
     <ScrollView orientation="vertical">
       <StackLayout orientation="vertical">
-        <label>Zone : {{nom}}</label>
+        <label>Zone : {{nomZone}}</label>
         <Button text="Prendre une photo" @tap="takePicture"/>
         <Button text="Choisir une photo" @tap="selectPicture"/>
-        <label v-if="!connection" textWrap="true">Vous êtes hors connexion. Vous ne pouvez pas envoyer de photos !</label>
+        <label v-if="!estConnecte" textWrap="true">Vous êtes hors connexion. Vous ne pouvez pas envoyer de photos !</label>
         <template id="modal" v-if="modalActive">
           <StackLayout class="p-20" backgroundColor="white">
             <Image class="images" :src="imgModal['src']" width="200" height="200"/>
@@ -16,18 +16,15 @@
             <TextField class="textField" v-model="newLong" hint="longitude"/>
             <Button class="btn btn-outline" text="Confirmer localisation" @tap="sendLocation(imgModal)"/>
             <Button class="btn btn-outline" text="Supprimer la photo" @tap="removeImage(imgModal)"/>
-            <Button class="btn btn-outline" text="Fermer" @tap="closeModal()"/>
+            <Button class="btn btn-outline" text="Fermer" @tap="closeModal"/>
           </StackLayout>
         </template>
-
         <WrapLayout>
           <Image v-for="img in images" :src="img['src']" width="75" height="75" @tap="showModal(img)" />
         </WrapLayout>
-        <!--<label v-for="img in imagesAvecLoc" :text="img['loc']['lat']" ></label>-->
-        <Button text="Envoyer les photos" @tap="sendPictures()" v-bind:isEnabled="hasPicture" v-if="connection"/>
+        <Button text="Envoyer les photos" @tap="sendPictures" v-bind:isEnabled="hasPicture" v-if="estConnecte"/>
         <label v-if="missLocation" text="Au moins une de vos photos n'a pas de géolocalisation" textWrap="true"></label>
-
-        <!--<label v-for="i in images">{{i['index']}}</label>-->
+        <ActivityIndicator v-bind:busy="load" class="spinner"/>
       </StackLayout>
     </ScrollView>
   </Page>
@@ -38,37 +35,39 @@
 import * as camera from "nativescript-camera";
 import * as imagepicker from "nativescript-imagepicker";
 
-import { Image } from "tns-core-modules/ui/image";
-import { isEnabled, enableLocationRequest, getCurrentLocation, watchLocation, distance, clearWatch } from "nativescript-geolocation";
-var geolocation = require("nativescript-geolocation");
-
 import axios from "axios";
-
-import { connectionType, getConnectionType, startMonitoring, stopMonitoring }from "tns-core-modules/connectivity";
-import { ImageSource, formFile, fromResource, fromBase64 } from 'tns-core-modules/image-source';
 import CryptoJS from "crypto-js";
 
+import { Image } from "tns-core-modules/ui/image";import { ImageSource, formFile, fromResource, fromBase64 } from 'tns-core-modules/image-source';
+import { connectionType, getConnectionType, startMonitoring, stopMonitoring }from "tns-core-modules/connectivity";
+import { isEnabled, enableLocationRequest, getCurrentLocation, watchLocation, distance, clearWatch } from "nativescript-geolocation";
+
+var geolocation = require("nativescript-geolocation");
+
 export default {
-  props: ["idZone", "url", "nom" ],
+  props: ["idZone", "urlZone", "nomZone" ],
   data() {
     return {
-      images: [],
-      localisation: [],
+      compteurIndex: -1,
+      estConnecte: '',
       hasPicture: false,
+      idPhoto: '',
+      images: [],
+      imgModal: '',
+      load: false,
+      localisation: [],
+      missLocation: false,
       modalActive: false,
-      imgModal: "",
-      connection: '',
-      postBody: "",
       newLat: '',
       newLong: '',
-      missLocation: false,
-      compteurIndex: -1,
-      idPhoto: ''
+      postBody: ''
     };
   },
   methods: {
-    // Méthode qui permet de séléctionner une photo dans l'album
     selectPicture() {
+      // Méthode qui permet de séléctionner une photo dans l'album
+      // params : aucun
+      // return : rien
       this.closeModal();
       let context = imagepicker.create({
         mode: "multiple"
@@ -236,6 +235,7 @@ export default {
       this.isEmptyImages();
     },
     uploadFile(detailsFile) {
+      this.load = true;
       let form = new FormData();
       let timestamps = ((Date.now() / 1000) | 0).toString();
       let keyAPI = "414295376186362";
@@ -269,24 +269,26 @@ export default {
         })
         .then(response => {
           console.log(response);
-      this.closeModal();
+          this.closeModal();
           this.images = [];
+          this.load = false;
+          console.log(this.load);
         });
       };
       xhr.send(form);
     }
   },
   created(){
-    var myConn = getConnectionType();
-    if(myConn != connectionType.none){
-      this.connection = true;
+    var myConnectionType = getConnectionType();
+    if(myConnectionType != connectionType.none){
+      this.estConnecte = true;
     }
     startMonitoring((newConnectionType) => {
       if(newConnectionType == connectionType.none){
-        this.connection = false;
+        this.estConnecte = false;
       }
       else{
-        this.connection = true;
+        this.estConnecte = true;
       }
     });
   }

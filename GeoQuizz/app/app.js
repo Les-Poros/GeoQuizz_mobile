@@ -1,9 +1,10 @@
-
 import Vue from "nativescript-vue";
 
 import router from "./router";
 
 import conf from "./conf/conf.json";
+
+import axios from "axios";
 
 Vue.prototype.$router = router
 Vue.prototype.$goTo = function (to, option) {
@@ -11,5 +12,5 @@ Vue.prototype.$goTo = function (to, option) {
 }
 
 new Vue({
-    render: h => h('frame', [h(router['home'],{props : {url:conf.apiUrl}})])
+    render: h => h('frame', [h(router['home'],{props : {urlZone: conf.apiMobileURL}})])
 }).$start();

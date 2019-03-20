@@ -6,7 +6,7 @@
       <TextField class="textField" v-model="nomZone" hint="Nom de la zone"/>
       <TextField class="textField" v-model="latitudeZone" hint="Latitude de la zone"/>
       <TextField class="textField" v-model="longitudeZone" hint="Longitude de la zone"/>
-      <label v-if="!connection" textWrap="true">Vous êtes hors connexion. Vous ne pouvez pas créer de séries !</label>
+      <label v-if="!estConnecte" textWrap="true">Vous êtes hors connexion. Vous ne pouvez pas créer de séries !</label>
       <Button text="Créer la zone et ajouter des photos" @tap="createZone" v-bind:isEnabled="nomZone != ''" />
     </StackLayout>
   </Page>
@@ -14,27 +14,32 @@
 
 <script>
 import axios from "axios";
+
 import { connectionType, getConnectionType, startMonitoring, stopMonitoring }from "tns-core-modules/connectivity";
 
 export default {
   data() {
     return {
-      nomZone: "",
-      latitudeZone: "",
-      longitudeZone: "",
-      postBody: "",
-      idZone: "",
-      link: "",
-      connection: ''
+      estConnecte: '',
+      idZone: '',
+      latitudeZone: '',
+      linkZone: '',
+      longitudeZone: '',
+      nomZone: '',
+      postBody: '',
+      linkZone: ''
     };
   },
   methods: {
     createZone() {
+      // Méthode qui crée une zone dans la base de données de notre API
+      // params : aucun
+      // return : rien
       this.postBody = {
         "ville": this.nomZone,
         "map_lat": this.latitudeZone,
         "map_lon": this.longitudeZone,
-        "dist": 500
+        "dist": 100
       };
       axios
         .post("https://mobile-lesporos.pagekite.me/series/", this.postBody, {
@@ -44,8 +49,8 @@ export default {
         })
         .then(response => {
           this.idSerie = response.data.id;
-          this.link = "https://mobile-lesporos.pagekite.me/series/"+this.idZone;
-          this.$goTo("picture", { props: { idZone: this.idZone, url: this.link, nom: this.nomZone }});
+          this.linkZone = "https://mobile-lesporos.pagekite.me/series/"+this.idZone;
+          this.$goTo("picture", { props: { idZone: this.idZone, urlZone: this.linkZone, nomZone: this.nomZone }});
         })
         .catch(error => {
           console.log(error);
@@ -53,16 +58,16 @@ export default {
     }
   },
   created(){
-    var myConn = getConnectionType();
-    if(myConn != connectionType.none){
-      this.connection = true;
+    var myConnectionType = getConnectionType();
+    if(myConnectionType != connectionType.none){
+      this.estConnecte = true;
     }
     startMonitoring((newConnectionType) => {
       if(newConnectionType == connectionType.none){
-        this.connection = false;
+        this.estConnecte = false;
       }
       else{
-        this.connection = true;
+        this.estConnecte = true;
       }
     });
   }
@@ -88,5 +93,4 @@ label{
 .content{
   width:90%;
 }
-
 </style>
