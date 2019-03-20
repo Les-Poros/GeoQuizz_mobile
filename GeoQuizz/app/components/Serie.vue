@@ -7,7 +7,7 @@
       <TextField class="textField" v-model="latitudeZone" hint="Latitude de la zone"/>
       <TextField class="textField" v-model="longitudeZone" hint="Longitude de la zone"/>
       <label v-if="!estConnecte" textWrap="true">Vous êtes hors connexion. Vous ne pouvez pas créer de zone !</label>
-      <Button v-if="estConnecte" text="Créer la zone et ajouter des photos" @tap="createZone" v-bind:isEnabled="nomZone != ''" />
+      <Button v-if="estConnecte" text="Créer la zone et ajouter des photos" @tap="createZone" v-bind:isEnabled="nomZone != '' && latitudeZone!='' && longitudeZone!=''" />
       <ActivityIndicator v-bind:busy="load" class="spinner"/>
     </StackLayout>
   </Page>

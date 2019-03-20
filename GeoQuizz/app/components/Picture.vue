@@ -38,7 +38,7 @@ import * as imagepicker from "nativescript-imagepicker";
 import axios from "axios";
 import CryptoJS from "crypto-js";
 
-import conf from "./conf/conf.json";
+import conf from "../conf/conf.json";
 
 import { Image } from "tns-core-modules/ui/image";
 import { ImageSource, fromFile, fromResource, fromBase64 } from 'tns-core-modules/image-source';
