@@ -63,7 +63,8 @@ export default {
       modalActive: false,
       newLat: '',
       newLong: '',
-      postBody: ''
+      postBody: '',
+      isSend: false
     };
   },
   methods: {
@@ -185,10 +186,15 @@ export default {
     },
     // Méthode qui va envoyer les photos à la série
     sendPictures() {
+      this.isSend = true;
       this.images.forEach(image => {
         if (this.estConnecte == true) {
           this.uploadFile(image);
           this.hasPicture = false;
+        }
+        else{
+          this.load = false;
+          this.isEmptyImages();
         }      
       });
     },
@@ -221,7 +227,12 @@ export default {
       this.isEmptyImages();
     },
     sendLocation(img){
-      var ind = img['index'];
+      var ind = '';
+      for(var i=0; i < this.images.length; i++){
+        if(this.images[i]['src'] == img['src']){
+          ind = i;
+        }
+      }
       if(this.newLat != '' ){
         this.images[ind]['loc']['lat']=this.newLat;
       }
@@ -266,6 +277,9 @@ export default {
           this.closeModal();
           this.removeImage(detailsFile);
           this.load = false;
+          if(!this.hasPicture){
+            this.isSend = false;
+          }
         });
       };
       xhr.send(form);
@@ -282,6 +296,9 @@ export default {
       }
       else{
         this.estConnecte = true;
+        if (this.isSend){
+          this.sendPictures();
+        }
       }
     });
   }
