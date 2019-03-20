@@ -6,7 +6,6 @@
         <label>Zone : {{nomZone}}</label>
         <Button text="Prendre une photo" @tap="takePicture"/>
         <Button text="Choisir une photo" @tap="selectPicture"/>
-        <label v-if="!estConnecte" textWrap="true">Vous êtes hors connexion. Vous ne pouvez pas envoyer de photos !</label>
         <template id="modal" v-if="modalActive">
           <StackLayout class="p-20" backgroundColor="white">
             <Image :src="imgModal['src']" width="200" height="200"/>
@@ -23,6 +22,7 @@
           <Image v-for="img in images" :src="img['src']" width="75" height="75" @tap="showModal(img)" class="images"/>
         </WrapLayout>
         <Button text="Envoyer les photos" @tap="sendPictures" v-bind:isEnabled="hasPicture" v-if="estConnecte"/>
+        <label v-if="!estConnecte" textWrap="true">Vous êtes hors connexion. Vous ne pouvez pas envoyer de photos !</label>
         <label v-if="missLocation" text="Au moins une de vos photos n'a pas de géolocalisation" textWrap="true"></label>
         <ActivityIndicator v-bind:busy="load" class="spinner"/>
       </StackLayout>
@@ -39,7 +39,7 @@ import axios from "axios";
 import CryptoJS from "crypto-js";
 
 import { Image } from "tns-core-modules/ui/image";
-import { ImageSource, formFile, fromResource, fromBase64 } from 'tns-core-modules/image-source';
+import { ImageSource, fromFile, fromResource, fromBase64 } from 'tns-core-modules/image-source';
 import { connectionType, getConnectionType, startMonitoring, stopMonitoring }from "tns-core-modules/connectivity";
 import { isEnabled, enableLocationRequest, getCurrentLocation, watchLocation, distance, clearWatch } from "nativescript-geolocation";
 
@@ -194,7 +194,9 @@ export default {
     // Méthode qui va envoyer les photos à la série
     sendPictures() {
       this.images.forEach(image => {
-        this.uploadFile(image);        
+        if (this.estConnecte == true) {
+          this.uploadFile(image);
+        }      
       });
     },
     // Méthode qui ouvre une modale avec l'image
@@ -271,7 +273,7 @@ export default {
         .then(response => {
           console.log(response);
           this.closeModal();
-          this.images = [];
+          this.removeImage(detailsFile);
           this.load = false;
         });
       };
