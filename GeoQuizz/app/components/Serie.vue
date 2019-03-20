@@ -6,8 +6,8 @@
       <TextField class="textField" v-model="nomZone" hint="Nom de la zone"/>
       <TextField class="textField" v-model="latitudeZone" hint="Latitude de la zone"/>
       <TextField class="textField" v-model="longitudeZone" hint="Longitude de la zone"/>
-      <label v-if="!estConnecte" textWrap="true">Vous êtes hors connexion. Vous ne pouvez pas créer de séries !</label>
-      <Button text="Créer la zone et ajouter des photos" @tap="createZone" v-bind:isEnabled="nomZone != ''" />
+      <label v-if="!estConnecte" textWrap="true">Vous êtes hors connexion. Vous ne pouvez pas créer de zone !</label>
+      <Button v-if="estConnecte" text="Créer la zone et ajouter des photos" @tap="createZone" v-bind:isEnabled="nomZone != ''" />
       <ActivityIndicator v-bind:busy="load" class="spinner"/>
     </StackLayout>
   </Page>
@@ -25,7 +25,7 @@ export default {
       idZone: '',
       latitudeZone: '',
       linkZone: '',
-      load: true,
+      load: false,
       longitudeZone: '',
       nomZone: '',
       postBody: '',

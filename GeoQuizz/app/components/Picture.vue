@@ -4,8 +4,8 @@
     <ScrollView orientation="vertical">
       <StackLayout orientation="vertical" class="content">
         <label>Zone : {{nomZone}}</label>
-        <Button text="Prendre une photo" @tap="takePicture"/>
-        <Button text="Choisir une photo" @tap="selectPicture"/>
+        <Button text="Prendre une photo" @tap="takePicture" v-bind:isEnabled="estConnecte"/>
+        <Button text="Choisir une photo" @tap="selectPicture" v-bind:isEnabled="estConnecte"/>
         <template id="modal" v-if="modalActive">
           <StackLayout class="p-20" backgroundColor="white">
             <Image :src="imgModal['src']" width="200" height="200"/>
@@ -22,7 +22,7 @@
           <Image v-for="img in images" :src="img['src']" width="75" height="75" @tap="showModal(img)" class="images"/>
         </WrapLayout>
         <Button text="Envoyer les photos" @tap="sendPictures" v-bind:isEnabled="hasPicture" v-if="estConnecte"/>
-        <label v-if="!estConnecte" textWrap="true">Vous êtes hors connexion. Vous ne pouvez pas envoyer de photos !</label>
+        <label v-if="!estConnecte" textWrap="true">Vous êtes hors connexion. Vous ne pouvez pas prendre ni envoyer de photos !</label>
         <label v-if="missLocation" text="Au moins une de vos photos n'a pas de géolocalisation" textWrap="true"></label>
         <ActivityIndicator v-bind:busy="load" class="spinner"/>
       </StackLayout>
@@ -196,6 +196,7 @@ export default {
       this.images.forEach(image => {
         if (this.estConnecte == true) {
           this.uploadFile(image);
+          this.hasPicture = false;
         }      
       });
     },
@@ -301,5 +302,6 @@ export default {
   .images{
     margin-left: 5px;
     margin-right: 5px;
+    margin-bottom: 5px;
   }
 </style>

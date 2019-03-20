@@ -65,6 +65,8 @@ export default {
       }
       else{
         this.estConnecte = true;
+      }
+    });
         axios
           .get("https://mobile-lesporos.pagekite.me/series")
           .then(response => {
@@ -77,10 +79,10 @@ export default {
             this.load = false;
           })
           .catch(error => {
+            alert("Le serveur n'est pas accessible");
+            this.load = false;
             console.log(error);
           });
-      }
-    });
   }
 };
 </script>
