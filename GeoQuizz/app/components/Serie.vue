@@ -52,9 +52,8 @@ export default {
           },
         })
         .then(response => {
-          this.idSerie = response.data.id;
-          this.linkZone = this.urlZone+"series/"+this.idZone;
-          this.$goTo("picture", { props: { idZone: this.idZone, urlZone: this.linkZone, nomZone: this.nomZone }});
+          this.idZone = response.data.id;
+          this.$goTo("picture", { props: { idZone: this.idZone, urlZone: this.urlZone, nomZone: this.nomZone }});
         })
         .catch(error => {
           console.log(error);
