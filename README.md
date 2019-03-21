@@ -20,6 +20,8 @@ Membres du projet :
 
 ## Lancer l'application mobile
 
+Avant de la lancer, modifier les informations du conf.json avec vos informations
+
 Dans le dossier GeoQuizz faire : 
 * tns preview --bundle
 
